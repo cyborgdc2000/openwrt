@@ -12,6 +12,21 @@ define Device/8devices_kiwi-dvk
 endef
 TARGET_DEVICES += 8devices_kiwi-dvk
 
+define Device/jrouter_6x11
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := JRouter
+	DEVICE_MODEL := AX6000
+	DEVICE_VARIANT := jrouter-6x11
+	DEVICE_DTS_CONFIG := config@6x11
+	SOC := ipq9574
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	NAND_SIZE := 256m
+	DEVICE_PACKAGES := ath11k-firmware-qcn9074 ath11k-firmware-ipq9574 kmod-ath11k-pci kmod-ath11k-ahb ipq-wifi-jrouter_6x11
+endef
+TARGET_DEVICES += jrouter_6x11
+
 define Device/qcom_rdp433
 	$(call Device/FitImageLzma)
 	DEVICE_VENDOR := Qualcomm Technologies, Inc.

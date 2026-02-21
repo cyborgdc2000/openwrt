@@ -1,0 +1,39 @@
+#!/bin/sh
+
+[ "$ACTION" == "add" ] || exit 0
+[ ! -e /etc/config/wireless ] && exit 0
+
+. /lib/functions.sh
+. /lib/functions/system.sh
+
+board=$(board_name)
+
+set_radio_mac()
+{
+	local section="$1"
+	local band
+	config_get band "$section" band
+	config_get radio "$section" radio
+
+	case "$board" in
+	jrouter,6x11)
+		WIFIMAC2G=$(mtd_get_mac_binary 0:ART 0x100e)
+		WIFIMAC5G=$(mtd_get_mac_binary 0:ART 0x4c00e)
+
+		case "$band" in
+		2g)
+			uci get wireless.@wifi-iface["$radio"].macaddr || uci set wireless.@wifi-iface["$radio"].macaddr="$WIFIMAC2G"
+			;;
+		5g)
+			uci get wireless.@wifi-iface["$radio"].macaddr || uci set wireless.@wifi-iface["$radio"].macaddr="$WIFIMAC5G"
+			;;
+		esac
+		;;
+	esac
+}
+
+config_load wireless
+config_foreach set_radio_mac wifi-device
+uci commit wireless
+
+exit 0

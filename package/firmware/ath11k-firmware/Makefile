@@ -26,8 +26,8 @@ RSTRIP:=:
 STRIP:=:
 
 ATH11K_LEGACY_FW_NAME:=ath11k-legacy-firmware
-ATH11K_LEGACY_FW_DATE:=2024-03-14
-ATH11K_LEGACY_FW_RELEASE:=795809c7
+ATH11K_LEGACY_FW_DATE:=2024-06-19
+ATH11K_LEGACY_FW_RELEASE:=b55bf720
 ATH11K_LEGACY_FW_SUBDIR:=$(ATH11K_LEGACY_FW_NAME)-$(ATH11K_LEGACY_FW_DATE)~$(ATH11K_LEGACY_FW_RELEASE)
 ATH11K_LEGACY_FW_SOURCE=$(ATH11K_LEGACY_FW_SUBDIR).tar.zst
 
@@ -35,8 +35,8 @@ define Download/$(ATH11K_LEGACY_FW_NAME)
 	FILE:=$(ATH11K_LEGACY_FW_SOURCE)
 	PROTO:=git
 	URL:=https://github.com/quic/upstream-wifi-fw.git
-	SOURCE_VERSION:=795809c7041582bd51bdfaa1f548b916ae8d4382
-	MIRROR_HASH:=b55bf7204543c7ba87876e84788239b0e47ad62434c5b0d1169526cde36a9daa
+	SOURCE_VERSION:=6ed267e22501be2cdd63ea564d407fb64eb879dd
+	MIRROR_HASH:=e7a89d1570f32552ade539376181494724b5eafb31d00451ff2dcf5a2922a0cb
 	SUBDIR:=$(ATH11K_LEGACY_FW_SUBDIR)
 endef
 
@@ -65,6 +65,11 @@ endef
 define Package/ath11k-firmware-ipq8074
 $(Package/ath11k-firmware-default)
   TITLE:=IPQ8074 ath11k firmware
+endef
+
+define Package/ath11k-firmware-ipq9574
+$(Package/ath11k-firmware-default)
+  TITLE:=IPQ9574 ath11k firmware
 endef
 
 define Package/ath11k-firmware-qcn9074
@@ -123,6 +128,13 @@ define Package/ath11k-firmware-ipq8074/install
 		$(1)/lib/firmware/IPQ8074/
 endef
 
+define Package/ath11k-firmware-ipq9574/install
+	$(INSTALL_DIR) $(1)/lib/firmware/IPQ9574/
+	$(INSTALL_DATA) \
+		$(BUILD_DIR)/$(ATH11K_LEGACY_FW_SUBDIR)/ath11k-firmware/IPQ9574/hw1.0/2.11.0.1.1/WLAN.HK.2.11.0.1.1-00039-QCAHKSWPL_SILICONZ-1/* \
+		$(1)/lib/firmware/IPQ9574/
+endef
+
 define Package/ath11k-firmware-qcn9074/install
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/QCN9074/hw1.0
 	$(INSTALL_DATA) \
@@ -136,4 +148,5 @@ $(eval $(call BuildPackage,ath11k-firmware-ipq5018))
 $(eval $(call BuildPackage,ath11k-firmware-ipq5018-qcn6122))
 $(eval $(call BuildPackage,ath11k-firmware-ipq6018))
 $(eval $(call BuildPackage,ath11k-firmware-ipq8074))
+$(eval $(call BuildPackage,ath11k-firmware-ipq9574))
 $(eval $(call BuildPackage,ath11k-firmware-qcn9074))
