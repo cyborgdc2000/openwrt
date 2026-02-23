@@ -1,0 +1,280 @@
+--- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
++++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+@@ -58,7 +58,6 @@
+ 			clocks = <&apcs_glb APCS_ALIAS0_CORE_CLK>;
+ 			clock-names = "cpu";
+ 			operating-points-v2 = <&cpu_opp_table>;
+-			cpu-supply = <&ipq9574_s1>;
+ 			#cooling-cells = <2>;
+ 		};
+ 
+@@ -71,7 +70,6 @@
+ 			clocks = <&apcs_glb APCS_ALIAS0_CORE_CLK>;
+ 			clock-names = "cpu";
+ 			operating-points-v2 = <&cpu_opp_table>;
+-			cpu-supply = <&ipq9574_s1>;
+ 			#cooling-cells = <2>;
+ 		};
+ 
+@@ -84,7 +82,6 @@
+ 			clocks = <&apcs_glb APCS_ALIAS0_CORE_CLK>;
+ 			clock-names = "cpu";
+ 			operating-points-v2 = <&cpu_opp_table>;
+-			cpu-supply = <&ipq9574_s1>;
+ 			#cooling-cells = <2>;
+ 		};
+ 
+@@ -97,7 +94,6 @@
+ 			clocks = <&apcs_glb APCS_ALIAS0_CORE_CLK>;
+ 			clock-names = "cpu";
+ 			operating-points-v2 = <&cpu_opp_table>;
+-			cpu-supply = <&ipq9574_s1>;
+ 			#cooling-cells = <2>;
+ 		};
+ 
+@@ -184,23 +180,7 @@
+ 	psci {
+ 		compatible = "arm,psci-1.0";
+ 		method = "smc";
+-	};
+-
+-	rpm: remoteproc {
+-		compatible = "qcom,ipq9574-rpm-proc", "qcom,rpm-proc";
+-
+-		glink-edge {
+-			compatible = "qcom,glink-rpm";
+-			interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
+-			qcom,rpm-msg-ram = <&rpm_msg_ram>;
+-			mboxes = <&apcs_glb 0>;
+-
+-			rpm_requests: rpm-requests {
+-				compatible = "qcom,rpm-ipq9574", "qcom,glink-smd-rpm";
+-				qcom,glink-channels = "rpm_requests";
+-			};
+-		};
+-	};
++	};	
+ 
+ 	reserved-memory {
+ 		#address-cells = <2>;
+@@ -228,8 +208,39 @@
+ 			hwlocks = <&tcsr_mutex 3>;
+ 			no-map;
+ 		};
++
++		q6_region: q6@4ab00000 {
++			reg = <0x0 0x4ab00000 0x0 0x2D00000>;
++			no-map;
++		};
+ 	};
+ 
++	wcss: smp2p-wcss {
++		compatible = "qcom,smp2p";
++		qcom,smem = <435>, <428>;
++
++		interrupt-parent = <&intc>;
++		interrupts = <0 322 1>;
++
++		mboxes = <&apcs_glb 9>;
++
++		qcom,local-pid = <0>;
++		qcom,remote-pid = <1>;
++
++		wcss_smp2p_out: master-kernel {
++			qcom,entry-name = "master-kernel";
++			qcom,smp2p-feature-ssr-ack;
++			#qcom,smem-state-cells = <1>;
++		};
++
++		wcss_smp2p_in: slave-kernel {
++			qcom,entry-name = "slave-kernel";
++
++			interrupt-controller;
++			#interrupt-cells = <2>;
++		};
++ 	};
++
+ 	soc: soc@0 {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+@@ -241,6 +252,11 @@
+ 			reg = <0x00060000 0x6000>;
+ 		};
+ 
++		tcsr_q6: syscon@1945000 {
++			compatible = "syscon";
++			reg = <0x01945000 0xe000>;
++		};
++
+ 		pcie0_phy: phy@84000 {
+ 			compatible = "qcom,ipq9574-qmp-gen3x1-pcie-phy";
+ 			reg = <0x00084000 0x1000>;
+@@ -1496,6 +1512,168 @@
+ 					      "tx";
+ 			};
+ 		};
++
++		wifi0: wifi@c0000000 {
++			compatible = "qcom,ipq9574-wifi";
++			reg = <0xc000000 0x2000000>;
++
++			interrupts = <GIC_SPI 320 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 319 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 318 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 316 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 315 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 314 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 311 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 310 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 411 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 410 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 40 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 39 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 302 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 301 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 37 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 36 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 296 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 295 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 294 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 293 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 292 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 291 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 290 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 289 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 288 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 239 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 236 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 235 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 234 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 233 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 232 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 231 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 230 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 229 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 228 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 224 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 223 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 203 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 183 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 180 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 179 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 178 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 177 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 176 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 163 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 160 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 414 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 159 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 158 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 157 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 156 IRQ_TYPE_EDGE_RISING>;
++
++			interrupt-names = "misc-pulse1",
++					  "misc-latch",
++					  "sw-exception",
++					  "ce0",
++					  "ce1",
++					  "ce2",
++					  "ce3",
++					  "ce4",
++					  "ce5",
++					  "ce6",
++					  "ce7",
++					  "ce8",
++					  "ce9",
++					  "ce10",
++					  "ce11",
++					  "host2wbm-desc-feed",
++					  "host2reo-re-injection",
++					  "host2reo-command",
++					  "host2rxdma-monitor-ring3",
++					  "host2rxdma-monitor-ring2",
++					  "host2rxdma-monitor-ring1",
++					  "reo2ost-exception",
++					  "wbm2host-rx-release",
++					  "reo2host-status",
++					  "reo2host-destination-ring4",
++					  "reo2host-destination-ring3",
++					  "reo2host-destination-ring2",
++					  "reo2host-destination-ring1",
++					  "rxdma2host-monitor-destination-mac3",
++					  "rxdma2host-monitor-destination-mac2",
++					  "rxdma2host-monitor-destination-mac1",
++					  "ppdu-end-interrupts-mac3",
++					  "ppdu-end-interrupts-mac2",
++					  "ppdu-end-interrupts-mac1",
++					  "rxdma2host-monitor-status-ring-mac3",
++					  "rxdma2host-monitor-status-ring-mac2",
++					  "rxdma2host-monitor-status-ring-mac1",
++					  "host2rxdma-host-buf-ring-mac3",
++					  "host2rxdma-host-buf-ring-mac2",
++					  "host2rxdma-host-buf-ring-mac1",
++					  "rxdma2host-destination-ring-mac3",
++					  "rxdma2host-destination-ring-mac2",
++					  "rxdma2host-destination-ring-mac1",
++					  "host2tcl-input-ring4",
++					  "host2tcl-input-ring3",
++					  "host2tcl-input-ring2",
++					  "host2tcl-input-ring1",
++					  "wbm2host-tx-completions-ring4",
++					  "wbm2host-tx-completions-ring3",
++					  "wbm2host-tx-completions-ring2",
++					  "wbm2host-tx-completions-ring1",
++					  "tcl2host-status-ring";
++			qcom,rproc = <&q6v5_wcss>;
++		};
++
++		q6v5_wcss: q6v5_wcss@cd00000 {
++			compatible = "qcom,ipq9574-wcss-pil";
++			reg = <0x0cd00000 0x4040>,
++			      <0x004ab000 0x20>;
++			reg-names = "qdsp6",
++				    "rmb";
++			qca,auto-restart;
++			qca,extended-intc;
++			interrupts-extended = <&intc 0 325 1>,
++					      <&wcss_smp2p_in 0 0>,
++					      <&wcss_smp2p_in 1 0>,
++					      <&wcss_smp2p_in 2 0>,
++					      <&wcss_smp2p_in 3 0>;
++			interrupt-names = "wdog",
++					  "fatal",
++					  "ready",
++					  "handover",
++					  "stop-ack";
++
++			resets = <&gcc GCC_WCSSAON_RESET>,
++				 <&gcc GCC_WCSS_BCR>,
++				 <&gcc GCC_WCSS_Q6_BCR>;
++
++			reset-names = "wcss_aon_reset",
++				      "wcss_reset",
++				      "wcss_q6_reset";
++
++			clocks = <&gcc GCC_PRNG_AHB_CLK>;
++			clock-names = "prng";
++
++			qcom,halt-regs = <&tcsr_q6 0xa000 0xd000 0x0>;
++
++			qcom,smem-states = <&wcss_smp2p_out 0>,
++					   <&wcss_smp2p_out 1>;
++			qcom,smem-state-names = "shutdown",
++						"stop";
++
++			memory-region = <&q6_region>;
++
++			glink-edge {
++				interrupts = <GIC_SPI 321 IRQ_TYPE_EDGE_RISING>;
++				qcom,remote-pid = <1>;
++				mboxes = <&apcs_glb 8>;
++
++				rpm_requests {
++					qcom,glink-channels = "IPCRTR";
++				};
++			};
++		};
+ 	};
+ 
+ 	thermal-zones {

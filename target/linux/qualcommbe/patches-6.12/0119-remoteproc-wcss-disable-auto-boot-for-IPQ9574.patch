@@ -1,0 +1,19 @@
+--- a/drivers/remoteproc/qcom_q6v5_wcss.c
++++ b/drivers/remoteproc/qcom_q6v5_wcss.c
+@@ -162,6 +162,7 @@
+ 	const struct rproc_ops *ops;
+ 	bool requires_force_stop;
+ 	bool need_mem_protection;
++	bool need_auto_boot;
+ };
+ 
+ static int q6v5_wcss_reset(struct q6v5_wcss *wcss)
+@@ -1150,7 +1151,7 @@
+ 		wcss->sysmon = qcom_add_sysmon_subdev(rproc,
+ 						      desc->sysmon_name,
+ 						      desc->ssctl_id);
+-
++	rproc->auto_boot = desc->need_auto_boot;
+ 	ret = rproc_add(rproc);
+ 	if (ret)
+ 		return ret;

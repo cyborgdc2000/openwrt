@@ -1,0 +1,20 @@
+--- a/drivers/net/pcs/pcs-qcom-ipq9574.c
++++ b/drivers/net/pcs/pcs-qcom-ipq9574.c
+@@ -822,6 +822,7 @@
+ 		qpcs_mii->qpcs = qpcs;
+ 		qpcs_mii->index = index;
+ 		qpcs_mii->pcs.ops = &ipq_pcs_phylink_ops;
++		qpcs_mii->pcs.neg_mode = true;
+ 		qpcs_mii->pcs.poll = true;
+ 
+ 		qpcs_mii->rx_clk = devm_get_clk_from_child(dev, mii_np, "rx");
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1158,6 +1158,7 @@
+ 	switch (interface) {
+ 	case PHY_INTERFACE_MODE_SGMII:
+ 	case PHY_INTERFACE_MODE_QSGMII:
++	case PHY_INTERFACE_MODE_PSGMII:
+ 	case PHY_INTERFACE_MODE_QUSGMII:
+ 	case PHY_INTERFACE_MODE_USXGMII:
+ 	case PHY_INTERFACE_MODE_10G_QXGMII:
